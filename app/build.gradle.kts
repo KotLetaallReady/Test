@@ -78,7 +78,7 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.1")
     implementation("io.ktor:ktor-server-call-logging:2.0.0")
     implementation("io.ktor:ktor-server-default-headers:2.0.0")
-    implementation ("io.ktor:ktor-server-netty:2.3.1") // Включает различные features, такие как DefaultHeaders и CallLogging
+    implementation ("io.ktor:ktor-server-netty:2.3.1")
     implementation("io.ktor:ktor-server-websockets:2.3.1")
 
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

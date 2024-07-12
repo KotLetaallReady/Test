@@ -32,6 +32,7 @@ class ConfigFragment : Fragment() {
         val SENDED_CONF = "ENTER_CONF"
     }
 
+    private lateinit var viewModel: ConfigViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -40,16 +41,26 @@ class ConfigFragment : Fragment() {
         return binding.root
     }
 
-    private lateinit var viewModel: ConfigViewModel
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel = ViewModelProvider(this)[ConfigViewModel::class.java]
+        viewModel = ViewModelProvider(requireActivity()).get(ConfigViewModel::class.java)
 
         val navController = findNavController()
 
-        binding.backButton.setOnClickListener {
+        viewModel.editTextIp.observe(viewLifecycleOwner, Observer { newIp ->
+            binding.ipEditText.setText(newIp ?: "0.0.0.0")
+        })
 
+        viewModel.editTextPort.observe(viewLifecycleOwner, Observer { newPort ->
+            binding.portEditText.setText(newPort?.toString() ?: "8080")
+        })
+
+        viewModel.editTextPeriodicity.observe(viewLifecycleOwner, Observer { newPeriodicity ->
+            binding.periodicityEditText.setText(newPeriodicity?.toString() ?: "150")
+        })
+
+        binding.backButton.setOnClickListener {
             val ipText = binding.ipEditText.text?.toString().takeIf { it!!.isNotBlank() } ?: "0.0.0.0"
             val portText = binding.portEditText.text?.toString()?.toIntOrNull() ?: 8080
             val periodicityText = binding.periodicityEditText.text?.toString()?.toIntOrNull() ?: 150
@@ -62,24 +73,11 @@ class ConfigFragment : Fragment() {
 
             viewModel.setConf(ipText, portText, periodicityText)
 
-            viewModel.editTextIp.observe(viewLifecycleOwner, Observer { newIp ->
-                binding.ipEditText.setText(newIp ?: "0.0.0.0")
-            })
-
-            viewModel.editTextPort.observe(viewLifecycleOwner, Observer { newPort ->
-                binding.portEditText.setText(newPort?.toString() ?: "8080")
-            })
-
-            viewModel.editTextPeriodicity.observe(viewLifecycleOwner, Observer { newPeriodicity ->
-                binding.periodicityEditText.setText(newPeriodicity?.toString() ?: "150")
-            })
-
             navController.navigate(
                 ConfigFragmentDirections.actionNavigationConfigToNavigationClient()
             )
         }
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()

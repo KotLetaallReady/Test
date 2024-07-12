@@ -7,12 +7,13 @@ import androidx.room.RoomDatabase
 import com.example.Test.data.db.PointDao
 import com.example.Test.data.model.PointDB
 
-@Database(entities = [PointDB::class], version = 1)
+@Database(entities = [PointDB::class], version = 1, exportSchema = false)
 abstract class AppDataBase : RoomDatabase() {
     abstract fun pointDao(): PointDao
 
     companion object {
-        @Volatile private var INSTANCE: AppDataBase? = null
+        @Volatile
+        private var INSTANCE: AppDataBase? = null
 
         fun getDatabase(context: Context): AppDataBase {
             return INSTANCE ?: synchronized(this) {

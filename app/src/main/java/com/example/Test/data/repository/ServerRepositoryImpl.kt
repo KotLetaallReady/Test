@@ -38,6 +38,7 @@ class ServerRepositoryImpl() : ServerRepository{
     var onGetNewPoints: ((points: MutableList<Point>) -> Unit)? = null
 
     override suspend fun startServer(port: Int){
+        points.clear()
         serverJob = CoroutineScope(Dispatchers.IO).launch {
             server = embeddedServer(Netty, port = port) {
                 install(WebSockets) {
@@ -70,7 +71,7 @@ class ServerRepositoryImpl() : ServerRepository{
         }
     }
 
-    fun getPoints() : MutableList<PointDB>{
+    fun getPointsDb() : MutableList<PointDB>{
         val pointsDb = mutableListOf<PointDB>()
         for(i in 0 until points.size) {
             var pointDb = PointDB(

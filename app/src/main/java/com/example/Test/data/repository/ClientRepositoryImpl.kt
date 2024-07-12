@@ -39,10 +39,8 @@ class ClientRepositoryImpl : ClientRepository {
         val request = Request.Builder().url(url).build()
         val listener = SocketListener()
         try {
+            Log.e("break", "Connected to $url")
             webSocket = client.newWebSocket(request, listener)
-            if (webSocket != null) {
-            } else {
-            }
         } catch (e: Exception) {
         }
     }
@@ -79,6 +77,7 @@ class ClientRepositoryImpl : ClientRepository {
     private inner class SocketListener : WebSocketListener() {
         override fun onOpen(webSocket: WebSocket, response: Response) {
             super.onOpen(webSocket, response)
+            Log.e("break", " Connected")
             isConnected = true
             coroutineScope.launch {
                 try {
