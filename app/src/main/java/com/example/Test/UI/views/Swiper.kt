@@ -63,6 +63,8 @@ class Swiper @JvmOverloads constructor(
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         var size = 15.0f
+        Log.e("drawLinesSw", event.size.toString())
+
         if(event.size>1)
             size = event.size
         var pressure = 100.0f
