@@ -29,7 +29,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.Duration
 
-class ServerRepositoryImpl() : ServerRepository{
+class ServerRepositoryImpl() : ServerRepository {
 
     private var server: NettyApplicationEngine? = null
     private var serverJob: Job? = null
@@ -37,7 +37,7 @@ class ServerRepositoryImpl() : ServerRepository{
 
     var onGetNewPoints: ((points: MutableList<Point>) -> Unit)? = null
 
-    override suspend fun startServer(port: Int){
+    override suspend fun startServer(port: Int) {
         points.clear()
         serverJob = CoroutineScope(Dispatchers.IO).launch {
             server = embeddedServer(Netty, port = port) {
@@ -71,9 +71,9 @@ class ServerRepositoryImpl() : ServerRepository{
         }
     }
 
-    fun getPointsDb() : MutableList<PointDB>{
+    fun getPointsDb(): MutableList<PointDB> {
         val pointsDb = mutableListOf<PointDB>()
-        for(i in 0 until points.size) {
+        for (i in 0 until points.size) {
             var pointDb = PointDB(
                 i,
                 points[i].x,

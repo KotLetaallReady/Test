@@ -1,11 +1,13 @@
 package com.example.Test.UI.client
 
+import android.annotation.SuppressLint
 import android.content.ContentValues.TAG
 import android.gesture.Gesture
 import android.health.connect.datatypes.units.Pressure
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment

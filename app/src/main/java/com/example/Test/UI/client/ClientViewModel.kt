@@ -23,7 +23,7 @@ class ClientViewModel : ViewModel() {
 
     private val clientRepository = ClientRepositoryImpl()
 
-    private var serverIp = "192.168.31.131"
+    private var serverIp = "192.168.31.207"//todo не забыть поменять
     private var serverPort = 8080
     private var serverPeriodically = 100
 
@@ -44,7 +44,7 @@ class ClientViewModel : ViewModel() {
         }
     }
 
-
+    // Новый метод для отправки точки касания
     fun sendPoint(point: Point) {
         clientRepository.addPointToSend(point)
     }

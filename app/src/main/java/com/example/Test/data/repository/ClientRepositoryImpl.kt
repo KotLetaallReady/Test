@@ -82,7 +82,7 @@ class ClientRepositoryImpl : ClientRepository {
             coroutineScope.launch {
                 try {
                     sendSwipeDataToServer()
-                }catch (e :Exception){
+                } catch (e: Exception) {
                 }
             }
         }
@@ -101,6 +101,8 @@ class ClientRepositoryImpl : ClientRepository {
         }
 
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+            super.onFailure(webSocket, t, response)
+            Log.e("break", "WebSocket error: ${t.message}", t)
             isConnected = false
         }
     }
@@ -109,3 +111,4 @@ class ClientRepositoryImpl : ClientRepository {
         return isConnected
     }
 }
+

@@ -36,7 +36,7 @@ class Swiper @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        for (line in lines.toMutableList()) {
+        for (line in lines) {
             paint.strokeWidth = line.size
             paint.alpha = pressureToAlpha(line.pressure)
             canvas.drawLine(line.startX, line.startY, line.endX, line.endY, paint)
@@ -44,11 +44,13 @@ class Swiper @JvmOverloads constructor(
     }
 
     fun drawLine(startX: Float, startY: Float, endX: Float, endY: Float, size: Float, pressure: Float) {
+        Log.d("Swiper", "drawLine - startX: $startX, startY: $startY, endX: $endX, endY: $endY, size: $size, pressure: $pressure")
         lines.add(Line(startX, startY, endX, endY, size, pressure))
         invalidate()
     }
 
     fun clearLines() {
+        Log.d("Swiper", "clearLines")
         lines.clear()
         invalidate()
     }
@@ -62,14 +64,11 @@ class Swiper @JvmOverloads constructor(
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        var size = 15.0f
-        Log.e("drawLinesSw", event.size.toString())
+        val size = if (event.size > 1) event.size else 15.0f
+        val pressure = if (event.pressure > 0) event.pressure else 100.0f
 
-        if(event.size>1)
-            size = event.size
-        var pressure = 100.0f
-        if(event.pressure>0)
-            pressure = event.pressure
+        Log.d("TouchEvent", "Action: ${event.action}, X: ${event.x}, Y: ${event.y}, Size: $size, Pressure: $pressure")
+
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
                 onPointerDown?.invoke(event.x, event.y, size, pressure)
@@ -78,7 +77,7 @@ class Swiper @JvmOverloads constructor(
                 if (event.historySize > 0) {
                     val historicalX = event.getHistoricalX(0)
                     val historicalY = event.getHistoricalY(0)
-                    drawLine(historicalX, historicalY, event.x, event.y, event.size, event.pressure)
+                    drawLine(historicalX, historicalY, event.x, event.y, size, pressure)
                 }
                 onDrag?.invoke(event.x, event.y, size, pressure)
             }

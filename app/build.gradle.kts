@@ -14,6 +14,7 @@ android {
     }
 
 
+
     defaultConfig {
         applicationId = "com.example.test"
         minSdk = 26
@@ -80,6 +81,15 @@ dependencies {
     implementation("io.ktor:ktor-server-default-headers:2.0.0")
     implementation ("io.ktor:ktor-server-netty:2.3.1")
     implementation("io.ktor:ktor-server-websockets:2.3.1")
+
+    // The core module that provides APIs to a shell
+    implementation ("com.github.topjohnwu.libsu:core:6.0.0")
+
+    // Optional: APIs for creating root services. Depends on ":core"
+    implementation ("com.github.topjohnwu.libsu:service:6.0.0")
+
+    // Optional: Provides remote file system support
+    implementation ("com.github.topjohnwu.libsu:nio:6.0.0")
 
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
