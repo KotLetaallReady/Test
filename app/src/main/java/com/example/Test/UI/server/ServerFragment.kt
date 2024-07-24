@@ -113,10 +113,9 @@ class ServerFragment : Fragment() {
     private fun replaySwipe(points: List<Point>) {
         if (points.isEmpty()) return
 
-        this.points.clear()  // Очистить существующие точки
-        this.points.addAll(points)  // Добавить новые точки
+        this.points.clear()
+        this.points.addAll(points)
 
-        // Отрисовка всех точек
         var previousPoint: Point? = null
         for (point in points) {
             if (previousPoint != null) {
@@ -144,11 +143,11 @@ class ServerFragment : Fragment() {
                 point.y,
                 point.pressure,
                 point.size,
-                0, // metaState
-                1.0f, // xPrecision
-                1.0f, // yPrecision
-                0, // deviceId
-                0 // edgeFlags
+                0,
+                1.0f,
+                1.0f,
+                0,
+                0
             ).apply {
                 source = InputDevice.SOURCE_TOUCHSCREEN
             }
@@ -159,7 +158,7 @@ class ServerFragment : Fragment() {
                     MotionEvent::class.java,
                     Int::class.javaPrimitiveType
                 )
-                method.invoke(inputManager, event, 0) // 0 - INJECT_INPUT_EVENT_MODE_WAIT_FOR_FINISH
+                method.invoke(inputManager, event, 0)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -170,10 +169,10 @@ class ServerFragment : Fragment() {
         GlobalScope.launch(Dispatchers.Main) {
             val shell = withContext(Dispatchers.IO) { Shell.getShell() }
             if (shell.isRoot) {
-                // Root доступ уже предоставлен
+
                 Toast.makeText(requireContext(), "Root access granted", Toast.LENGTH_SHORT).show()
             } else {
-                // Root доступ не предоставлен
+
                 Toast.makeText(requireContext(), "Root access denied", Toast.LENGTH_SHORT).show()
             }
         }

@@ -50,7 +50,6 @@ class Swiper @JvmOverloads constructor(
     }
 
     fun clearLines() {
-        Log.d("Swiper", "clearLines")
         lines.clear()
         invalidate()
     }
