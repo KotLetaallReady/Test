@@ -27,6 +27,7 @@ import com.example.test.databinding.FragmentServerBinding
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.DataOutputStream
@@ -52,7 +53,6 @@ class ServerFragment : Fragment() {
 
         viewModel = ViewModelProvider(requireActivity()).get(ServerViewModel::class.java)
 
-        // Новый метод для установки наблюдателей на ViewModel
         setupViewModelObservers()
 
         binding.switchEnable.setOnCheckedChangeListener { _, isChecked ->
@@ -62,6 +62,7 @@ class ServerFragment : Fragment() {
                 draw()
             } else {
                 viewModel.serverOff()
+                viewModel.savePoint(requireContext())
             }
         }
 
@@ -76,7 +77,7 @@ class ServerFragment : Fragment() {
         with(binding.swiper){
             onDrag  = { x, y, size, pressure ->
                 if (isDragging){
-                    points.add(Point(x, y, size, pressure))
+                    points.add(Point(x, y, size, pressure, false))
                     binding.swiper.drawLine(
                         points[points.size-2].x, points[points.size-2].y,
                         points[points.size-1].x, points[points.size-1].y,
@@ -87,12 +88,13 @@ class ServerFragment : Fragment() {
             }
             onPointerDown = { x, y, size, pressure ->
                 if(!isDragging){
-                    points.add(Point(x, y, size, pressure))
+                    points.add(Point(x, y, size, pressure, false))
                 }
                 isDragging = true
             }
             onPointerUp = { x, y, size, pressure ->
                 if(isDragging) {
+                    points.add(Point(x, y, size, pressure, true))
                     binding.swiper.clearLines()
                 }
                 isDragging = false
@@ -100,68 +102,72 @@ class ServerFragment : Fragment() {
         }
     }
 
-    // Метод для установки наблюдателей на ViewModel
     private fun setupViewModelObservers() {
         viewModel.apply {
-            serverRepository.onGetNewPoints = { points ->
+            points.observe(viewLifecycleOwner, Observer { points ->
                 replaySwipe(points)
-            }
+            })
         }
     }
 
-    // Метод для воспроизведения свайпов
     private fun replaySwipe(points: List<Point>) {
         if (points.isEmpty()) return
 
-        this.points.clear()
-        this.points.addAll(points)
-
-        var previousPoint: Point? = null
-        for (point in points) {
-            if (previousPoint != null) {
-                binding.swiper.drawLine(
-                    previousPoint.x, previousPoint.y,
-                    point.x, point.y,
-                    point.size,
-                    point.pressure
-                )
-            }
-            previousPoint = point
-        }
-
         val inputManager = requireContext().getSystemService(Context.INPUT_SERVICE) as InputManager
 
-        for (point in points) {
-            val eventTime = SystemClock.uptimeMillis()
-            val action = if (point.isEnd) MotionEvent.ACTION_UP else MotionEvent.ACTION_MOVE
+        viewLifecycleOwner.lifecycleScope.launch {
+            var previousPoint: Point? = null
+            for (point in points) {
+                if (previousPoint != null) {
+                    binding.swiper.drawLine(
+                        previousPoint.x, previousPoint.y,
+                        point.x, point.y,
+                        point.size,
+                        point.pressure
+                    )
+                }
 
-            val event = MotionEvent.obtain(
-                eventTime,
-                eventTime,
-                action,
-                point.x,
-                point.y,
-                point.pressure,
-                point.size,
-                0,
-                1.0f,
-                1.0f,
-                0,
-                0
-            ).apply {
-                source = InputDevice.SOURCE_TOUCHSCREEN
+                val eventTime = SystemClock.uptimeMillis()
+                val action = if (point.isEnd) MotionEvent.ACTION_UP else MotionEvent.ACTION_MOVE
+
+                val event = MotionEvent.obtain(
+                    eventTime,
+                    eventTime,
+                    action,
+                    point.x,
+                    point.y,
+                    point.pressure,
+                    point.size,
+                    0,
+                    1.0f,
+                    1.0f,
+                    0,
+                    0
+                ).apply {
+                    source = InputDevice.SOURCE_TOUCHSCREEN
+                }
+
+                try {
+                    val method = InputManager::class.java.getMethod(
+                        "injectInputEvent",
+                        MotionEvent::class.java,
+                        Int::class.javaPrimitiveType
+                    )
+                    method.invoke(inputManager, event, 0)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+
+                previousPoint = point
+
+                if (point.isEnd) {
+                    delay(500)
+                    binding.swiper.clearLines()
+                    previousPoint = null
+                }
             }
 
-            try {
-                val method = InputManager::class.java.getMethod(
-                    "injectInputEvent",
-                    MotionEvent::class.java,
-                    Int::class.javaPrimitiveType
-                )
-                method.invoke(inputManager, event, 0)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+            binding.swiper.clearLines()
         }
     }
 
@@ -169,10 +175,8 @@ class ServerFragment : Fragment() {
         GlobalScope.launch(Dispatchers.Main) {
             val shell = withContext(Dispatchers.IO) { Shell.getShell() }
             if (shell.isRoot) {
-
                 Toast.makeText(requireContext(), "Root access granted", Toast.LENGTH_SHORT).show()
             } else {
-
                 Toast.makeText(requireContext(), "Root access denied", Toast.LENGTH_SHORT).show()
             }
         }

@@ -48,16 +48,8 @@ class ServerViewModel : ViewModel() {
         pointRepository = PointRepository(pointDao)
         viewModelScope.launch(Dispatchers.IO) {
             val pointsDb = pointRepository.getPoints()
-            _points.value?.clear()
             dbToPoint(pointsDb)
         }
-    }
-
-    fun serverOff() {
-        viewModelScope.launch(Dispatchers.IO) {
-            serverRepository.stopServer()
-        }
-        pointsDb = serverRepository.getPointsDb() ?: mutableListOf()
     }
 
     private fun dbToPoint(pointsDb: MutableList<PointDB>) {
@@ -75,6 +67,13 @@ class ServerViewModel : ViewModel() {
         }
 
         _points.postValue(pointsList)
+    }
+
+    fun serverOff() {
+        viewModelScope.launch(Dispatchers.IO) {
+            serverRepository.stopServer()
+        }
+        pointsDb = serverRepository.getPointsDb() ?: mutableListOf()
     }
 
     fun setPort(text: String) {

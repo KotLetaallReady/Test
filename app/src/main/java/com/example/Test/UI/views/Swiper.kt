@@ -44,7 +44,6 @@ class Swiper @JvmOverloads constructor(
     }
 
     fun drawLine(startX: Float, startY: Float, endX: Float, endY: Float, size: Float, pressure: Float) {
-        Log.d("Swiper", "drawLine - startX: $startX, startY: $startY, endX: $endX, endY: $endY, size: $size, pressure: $pressure")
         lines.add(Line(startX, startY, endX, endY, size, pressure))
         invalidate()
     }
@@ -66,7 +65,6 @@ class Swiper @JvmOverloads constructor(
         val size = if (event.size > 1) event.size else 15.0f
         val pressure = if (event.pressure > 0) event.pressure else 100.0f
 
-        Log.d("TouchEvent", "Action: ${event.action}, X: ${event.x}, Y: ${event.y}, Size: $size, Pressure: $pressure")
 
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
